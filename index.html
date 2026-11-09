@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Naughty or Nice? | North Pole-ice Department</title>
+  <meta name="description" content="Help the North Pole-ice Department find out which Chip is Naughty this year.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Permanent+Marker&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============ SCENE: OFFICE ============ -->
+  <section id="scene-office" class="scene" data-scene="office">
+    <div class="stage office-stage">
+      <img class="stage-bg" src="assets/office.jpg" alt="The North Pole-ice Department office at night">
+      <svg class="stage-overlay" id="office-overlay" viewBox="0 0 2000 1286" preserveAspectRatio="none" aria-hidden="false">
+        <defs>
+          <clipPath id="window-clip"><polygon points="138,200 410,262 410,665 208,690"/></clipPath>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g id="deco-snow" clip-path="url(#window-clip)"></g>
+        <g id="deco-lights"></g>
+        <g id="deco-static"></g>
+
+        <!-- Secret: invisible hit area over the clock (plays a sound, no hover cue) -->
+        <circle id="clock-secret" cx="938" cy="268" r="64" fill="transparent" style="pointer-events: all; cursor: default"/>
+
+        <!-- Secret: invisible hit area over the window (plays snow SFX, no hover cue) -->
+        <polygon id="window-secret" points="138,200 410,262 410,665 208,690" fill="transparent" style="pointer-events: all; cursor: default"/>
+
+        <!-- Secret: invisible hit area over the desk lamp (plays SFX, no hover cue) -->
+        <polygon id="lamp-secret" points="665,585 850,585 850,705 780,705 795,880 675,880 705,705 665,705" fill="transparent" style="pointer-events: all; cursor: default"/>
+
+        <!-- Secret: invisible hit area over the trash can (plays SFX, no hover cue) -->
+        <polygon id="trash-secret" points="1660,1045 1858,1045 1838,1262 1688,1262" fill="transparent" style="pointer-events: all; cursor: default"/>
+
+        <!-- Secret: invisible hit area over the Christmas tree + presents (plays SFX, no hover cue) -->
+        <polygon id="tree-secret" points="300,835 398,1075 398,1136 204,1136 204,1075" fill="transparent" style="pointer-events: all; cursor: default"/>
+
+        <!-- Secret: invisible hit area over the door on the right (plays SFX, no hover cue) -->
+        <polygon id="door-secret" points="1650,255 1908,198 1918,1012 1650,935" fill="transparent" style="pointer-events: all; cursor: default"/>
+
+        <!-- Clickable hotspots -->
+        <a href="#board" class="hotspot" aria-label="Open the suspect board">
+          <polygon points="1325,322 1606,294 1606,726 1325,706"/>
+        </a>
+        <a href="#computer" class="hotspot" aria-label="Open the computer case files">
+          <polygon points="1055,616 1410,616 1410,850 1055,850"/>
+        </a>
+      </svg>
+
+      <a href="#board" class="hotspot-label" style="left:76%;top:57.5%">Suspect Board</a>
+      <a href="#computer" class="hotspot-label" style="left:61.6%;top:68%">Case Files</a>
+
+      <header class="office-title">
+        <div class="badge">NPD</div>
+        <div>
+          <h1>Naughty or Nice?</h1>
+          <p>North Pole-ice Department &middot; Which Chip is <span class="naughty">Naughty</span> this year?</p>
+          <button type="button" class="briefing-link" id="open-briefing">Mission briefing</button>
+        </div>
+      </header>
+    </div>
+  </section>
+
+  <!-- ============ SCENE: SUSPECT BOARD ============ -->
+  <section id="scene-board" class="scene" data-scene="board" hidden>
+    <div class="scene-wrap">
+      <div class="topbar">
+        <a href="#office" class="btn btn-ghost">&larr; Back to office</a>
+        <div class="counter" id="suspect-counter">24 suspects remaining</div>
+        <button class="btn btn-ghost" id="reset-board" type="button">Reset board</button>
+      </div>
+
+      <div class="board-frame">
+        <svg class="garland" viewBox="0 0 1000 60" preserveAspectRatio="none" aria-hidden="true" id="board-garland"></svg>
+        <div class="board-inner">
+          <div class="board-label">MOST WANTED</div>
+          <p class="board-hint">Click a suspect to clear them as <b>NICE</b>. Click again to put them back on the list.</p>
+          <div class="suspect-grid-wrap">
+            <svg class="string-layer" id="string-layer" aria-hidden="true"></svg>
+            <div class="suspect-grid" id="suspect-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="board-actions">
+        <a href="#accuse" class="btn btn-primary btn-big">SUBMIT GUESS</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCENE: SUBMIT GUESS ============ -->
+  <section id="scene-accuse" class="scene" data-scene="accuse" hidden>
+    <div class="scene-wrap">
+      <div class="topbar">
+        <a href="#board" class="btn btn-ghost">&larr; Back to board</a>
+        <div></div><div></div>
+      </div>
+
+      <div class="paper">
+        <div class="paper-head">
+          <div class="stamp-small">OFFICIAL</div>
+          <h2>Naughty Chip Accusation Form</h2>
+          <p>Choose the Chip you believe is Naughty. <b>You only get one guess</b> &mdash; make it count, detective.</p>
+        </div>
+
+        <div id="accuse-closed" class="notice" hidden></div>
+
+        <form id="accuse-form" novalidate>
+          <fieldset class="lineup">
+            <legend>1. Select your suspect</legend>
+            <div class="lineup-grid" id="lineup-grid" role="radiogroup" aria-label="Suspects"></div>
+          </fieldset>
+
+          <fieldset class="detective">
+            <legend>2. Detective details</legend>
+            <label>Full name
+              <input type="text" id="f-name" name="name" autocomplete="name" maxlength="80" required>
+            </label>
+            <label>Email
+              <input type="email" id="f-email" name="email" autocomplete="email" maxlength="120" required>
+            </label>
+          </fieldset>
+
+          <div class="form-error" id="form-error" role="alert"></div>
+          <button type="submit" class="btn btn-primary btn-big" id="submit-btn">SUBMIT GUESS</button>
+          <p class="fine">One submission per name and email. Submissions are final.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCENE: COMPUTER ============ -->
+  <section id="scene-computer" class="scene" data-scene="computer" hidden>
+    <div class="stage computer-stage">
+      <img class="stage-bg" src="assets/computer.jpg" alt="Police computer terminal">
+      <div class="screen">
+        <div class="screen-head">
+          <span>PASSWORD VERIFIED</span>
+          <span class="blink">_</span>
+        </div>
+        <div class="screen-sub">NPD SECURE TERMINAL &middot; RECENT CASE FILES</div>
+        <ul class="case-list" id="case-list"></ul>
+      </div>
+      <a href="#office" class="btn btn-ghost stage-back">&larr; Back to office</a>
+    </div>
+  </section>
+
+  <!-- ============ OPENING GATE: one click unlocks sound, then the briefing appears ============ -->
+  <div class="gate" id="gate">
+    <div class="gate-inner">
+      <div class="gate-badge">NPD</div>
+      <div class="gate-kicker">North Pole-ice Department</div>
+      <h1 class="gate-title">Naughty or Nice?</h1>
+      <button type="button" class="btn btn-primary btn-big" id="gate-open">OPEN THE CASE</button>
+      <p class="gate-note">Sound on for the full experience</p>
+    </div>
+  </div>
+
+  <!-- ============ MISSION BRIEFING (shows when the game opens) ============ -->
+  <div class="briefing" id="briefing" hidden>
+    <div class="briefing-card" role="dialog" aria-modal="true" aria-labelledby="briefing-title">
+      <img class="briefing-chip" src="assets/chip-briefing.png" alt="Chip, looking tired, holding a coffee mug over a spilled puddle of coffee">
+      <div class="briefing-text">
+        <div class="briefing-kicker">North Pole-ice Department &middot; Mission Briefing</div>
+        <h2 id="briefing-title">Naughty or Nice?</h2>
+        <p>Help the North Pole-ice Department catch which Chip has been <b class="naughty-red">Naughty</b> this year!</p>
+        <p>Solve the puzzles to get clues from eyewitnesses about which Chip did it!</p>
+        <p class="briefing-warn">You only get <b>ONE</b> submission. You may submit a guess early, <b>BUT</b> know that is your only shot to guess. So <b>CHOOSE WISELY!</b> The first 3 GMs to correctly guess the culprit will get a prize!</p>
+        <button type="button" class="btn btn-primary btn-big" id="close-briefing">START INVESTIGATING</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL ============ -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal-x" id="modal-x" type="button" aria-label="Close">&times;</button>
+      <h3 id="modal-title"></h3>
+      <div id="modal-body"></div>
+      <div class="modal-actions" id="modal-actions"></div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="audio.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

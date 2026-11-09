@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case File #3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --ink: #1d1838;
+    --paper: #f7f3e8;
+    --wall: #7d1d2c;
+    --wall-2: #6d1826;
+    --floor: #8a5a35;
+    --floor-2: #7a4e2d;
+    --red: #c8203a;
+    --green: #1f8a4c;
+    --gold: #f4c542;
+    --font-type: "Special Elite", "Courier New", monospace;
+    --font-marker: "Permanent Marker", "Comic Sans MS", cursive;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-type); }
+  [hidden] { display: none !important; }
+
+  .wrap { padding: 10px 16px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .head { width: 100%; max-width: 1100px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px; }
+  .head h1 { margin: 0; font-size: clamp(18px, 2.6vw, 26px); }
+  .count { font-size: 15px; }
+  .hint { margin: 0; font-size: 14px; text-align: center; max-width: 1100px; }
+
+  /* ---------- the room ---------- */
+  .room {
+    position: relative; overflow: hidden;
+    width: min(100%, calc((100dvh - 100px) * 16 / 9), 1100px);
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    container-type: inline-size;
+    box-shadow: 0 10px 28px rgba(0,0,0,.28);
+    background:
+      repeating-linear-gradient(90deg, var(--wall) 0 3cqw, var(--wall-2) 3cqw 6cqw);
+  }
+  .floor {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 36%;
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0 .15cqw, transparent .15cqw 9cqw),
+      linear-gradient(180deg, var(--floor-2), var(--floor));
+    box-shadow: inset 0 1.2cqw 1.6cqw rgba(0,0,0,.25);
+  }
+  .baseboard { position: absolute; left: 0; right: 0; bottom: 36%; height: 1.6cqw; background: #f3e9d6; box-shadow: 0 .3cqw .4cqw rgba(0,0,0,.2); }
+  .window {
+    position: absolute; left: 70%; top: 9%; width: 18%; height: 34%;
+    background: linear-gradient(180deg, #0f2442, #23477a);
+    border: 1.1cqw solid #f3e9d6; border-radius: .6cqw;
+    box-shadow: inset 0 0 0 .5cqw #f3e9d6;
+    overflow: hidden;
+  }
+  .window::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: .8cqw; margin-left: -.4cqw; background: #f3e9d6; }
+  .window::after { content: ""; position: absolute; top: 50%; left: 0; right: 0; height: .8cqw; margin-top: -.4cqw; background: #f3e9d6; }
+  .flake { position: absolute; width: .45cqw; height: .45cqw; border-radius: 50%; background: #fff; animation: fall linear infinite; }
+  @keyframes fall { from { transform: translateY(-2cqw); } to { transform: translateY(16cqw); } }
+  .wreath {
+    position: absolute; left: 12%; top: 9%; width: 11cqw; height: 11cqw; border-radius: 50%;
+    border: 2.4cqw dotted #2a8a4a; box-shadow: 0 0 0 .6cqw #1d6b37 inset, 0 0 0 .4cqw #1d6b37;
+  }
+  .wreath::after { content: ""; position: absolute; left: 50%; bottom: -2.6cqw; width: 4cqw; height: 2.4cqw; margin-left: -2cqw;
+    background: radial-gradient(circle at 25% 50%, var(--red) 45%, transparent 47%), radial-gradient(circle at 75% 50%, var(--red) 45%, transparent 47%); }
+  .lights { position: absolute; left: 0; right: 0; top: 0; height: 6cqw; pointer-events: none; }
+  .title-sign {
+    position: absolute; left: 50%; top: 9%; transform: translateX(-50%) rotate(-2deg);
+    background: var(--paper); color: var(--ink); font-family: var(--font-marker);
+    font-size: 3cqw; padding: .6cqw 2.4cqw; border-radius: .5cqw; box-shadow: 0 .6cqw 1cqw rgba(0,0,0,.3);
+    white-space: nowrap;
+  }
+  .title-sign small { display: block; font-family: var(--font-type); font-size: 1.3cqw; text-align: center; }
+
+  /* ---------- presents ---------- */
+  .gift {
+    position: absolute; padding: 0; border: 0; background: none; cursor: pointer;
+    left: var(--l); bottom: var(--b); width: var(--w); z-index: var(--z);
+    container-type: inline-size;
+    transition: transform .15s;
+  }
+  .gift:hover:not(.opened) { transform: translateY(-.6cqw) rotate(-1.5deg); }
+  .gift:focus-visible { outline: .4cqw solid var(--gold); outline-offset: .3cqw; }
+  .gift .box {
+    position: relative; display: block; width: 92%; margin: 0 auto; aspect-ratio: 1 / var(--r);
+    background-color: var(--c1);
+    background-image:
+      linear-gradient(90deg, transparent 44%, var(--rb) 44% 56%, transparent 56%),
+      var(--pat);
+    box-shadow: inset -6cqw -4cqw 0 rgba(0,0,0,.12), 0 3cqw 4cqw rgba(0,0,0,.25);
+    border-radius: 2cqw;
+  }
+  .gift .inside { position: absolute; left: 4%; right: 4%; top: 0; height: 14cqw; background: linear-gradient(180deg, #2b1a10, #4a2c1a); border-radius: 0 0 3cqw 3cqw; opacity: 0; }
+  .gift .lid {
+    position: absolute; left: 0; right: 0; top: -12cqw; height: 18cqw; display: block;
+    background-color: var(--c1);
+    background-image: linear-gradient(90deg, transparent 44%, var(--rb) 44% 56%, transparent 56%), var(--pat);
+    box-shadow: inset 0 -3cqw 0 rgba(0,0,0,.15), 0 1.5cqw 2cqw rgba(0,0,0,.2);
+    border-radius: 2.5cqw;
+    transition: transform .6s cubic-bezier(.3,1.6,.5,1), opacity .6s;
+    transform-origin: 20% 100%;
+  }
+  .gift .bow { position: absolute; left: 50%; top: -15cqw; width: 34cqw; height: 18cqw; margin-left: -17cqw; }
+  .gift .bow::before, .gift .bow::after {
+    content: ""; position: absolute; top: 0; width: 50%; height: 100%;
+    background: var(--rb); border-radius: 50%;
+    box-shadow: inset 0 0 0 3cqw rgba(0,0,0,.12);
+  }
+  .gift .bow::before { left: 0; transform: rotate(-18deg); }
+  .gift .bow::after { right: 0; transform: rotate(18deg); }
+  .gift .knot { position: absolute; left: 50%; top: -6cqw; width: 12cqw; height: 12cqw; margin-left: -6cqw; background: var(--rb); border-radius: 50%; z-index: 1; filter: brightness(.9); }
+  .gift .tagtie { position: absolute; right: 6%; top: 18%; width: 14cqw; height: 18cqw; background: #fffdf6; border-radius: 1cqw 1cqw 1cqw 1cqw; transform: rotate(14deg); box-shadow: 0 1cqw 1.4cqw rgba(0,0,0,.25); }
+  .gift .tagtie::before { content: ""; position: absolute; left: 50%; top: 2.5cqw; width: 3cqw; height: 3cqw; margin-left: -1.5cqw; border-radius: 50%; background: var(--c1); box-shadow: inset 0 0 0 .8cqw #bbb; }
+
+  .gift .label {
+    position: absolute; left: 50%; bottom: 100%; transform: translate(-50%, -40cqw) rotate(-3deg) scale(.4);
+    background: #fffdf6; color: var(--ink); font-family: var(--font-marker);
+    font-size: 11cqw; line-height: 1.05; padding: 3cqw 6cqw; border-radius: 3cqw; white-space: nowrap;
+    box-shadow: 0 2cqw 4cqw rgba(0,0,0,.35); border: .8cqw solid var(--green);
+    opacity: 0; pointer-events: none; transition: transform .45s .15s, opacity .3s .15s;
+  }
+  .gift .label small { display: block; font-family: var(--font-type); font-size: 7cqw; color: var(--green); }
+
+  .gift.opened { cursor: default; }
+  .gift.opened .lid { transform: translate(-30%, -45cqw) rotate(-32deg); opacity: .0; }
+  .gift.opened .tagtie { opacity: 0; }
+  .gift.opened .inside { opacity: 1; }
+  .gift.opened .label { opacity: 1; transform: translate(-50%, -4cqw) rotate(-3deg) scale(1); }
+  @media (prefers-reduced-motion: reduce) { .gift .lid, .gift .label { transition: none; } .flake { animation: none; } }
+
+  /* ---------- leads ---------- */
+  .leads {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 54%; z-index: 50;
+    background: #fffdf6; border: .3cqw dashed rgba(29,24,56,.35); border-radius: 1.4cqw;
+    padding: 2.4cqw 3cqw; text-align: center; box-shadow: 0 1cqw 3cqw rgba(0,0,0,.4);
+    animation: pop .5s ease-out;
+  }
+  @keyframes pop { from { transform: translate(-50%, -50%) scale(.85); opacity: 0; } }
+  .leads .stamp { display: inline-block; border: .35cqw solid var(--green); color: var(--green); font-size: 2.3cqw; letter-spacing: .14em; padding: .3cqw 1.4cqw; transform: rotate(-4deg); border-radius: .8cqw; }
+  .leads h2 { margin: 1.2cqw 0 1cqw; font-size: 2.3cqw; }
+  .leads ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1cqw; text-align: left; }
+  .leads li { display: flex; gap: 1.4cqw; align-items: center; font-size: 2cqw; background: #fff; border: .2cqw solid rgba(29,24,56,.15); border-radius: 1cqw; padding: 1.1cqw 1.4cqw; }
+  .leads li b { flex: none; display: grid; place-items: center; width: 3.6cqw; height: 3.6cqw; border-radius: 50%; background: var(--red); color: #fff; font-size: 1.8cqw; }
+  .leads button { margin-top: 1.2cqw; background: none; border: 0; font: inherit; font-size: 1.5cqw; text-decoration: underline; cursor: pointer; color: inherit; opacity: .7; }
+
+  /* ---------- tag viewer ---------- */
+  .viewer { position: fixed; inset: 0; background: rgba(29,24,56,.6); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 100; }
+  .viewer-card { background: var(--paper); border-radius: 14px; padding: 16px; width: min(720px, 100%); max-height: 100%; overflow: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; box-shadow: 0 20px 40px rgba(0,0,0,.35); }
+  .viewer-card img { width: 100%; max-height: 52dvh; object-fit: contain; border-radius: 8px; display: block; }
+  .viewer-card label { font-size: 15px; }
+  .viewer-card input { width: 100%; font-family: var(--font-marker); font-size: 22px; text-align: center; padding: 8px 10px; border: 2px solid rgba(29,24,56,.3); border-radius: 8px; background: #fff; color: var(--ink); }
+  .viewer-card input:focus { outline: none; border-color: var(--red); }
+  .viewer-card input.bad { border-color: var(--red); animation: shake .35s; }
+  @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .msg { min-height: 1.3em; color: var(--red); font-weight: bold; text-align: center; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .btn { font-family: var(--font-type); font-size: 18px; letter-spacing: .06em; border-radius: 8px; padding: 10px 22px; cursor: pointer; }
+  .btn-open { background: var(--red); color: #fff; border: 2px solid #fff; box-shadow: 0 4px 0 #8c1426; }
+  .btn-open:hover { background: #dc2c47; }
+  .btn-back { background: transparent; color: var(--ink); border: 2px solid rgba(29,24,56,.35); }
+  .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1>Case File #3 · Return to Sender</h1>
+    <div class="count" id="count">0 of 14 opened</div>
+  </div>
+  <p class="hint">The gift tags got scrambled. Click a present, figure out who it's for, and open it.</p>
+
+  <div class="room" id="room">
+    <svg class="lights" id="lights" viewBox="0 0 1000 60" preserveAspectRatio="none" aria-hidden="true"></svg>
+    <div class="wreath" aria-hidden="true"></div>
+    <div class="window" id="window" aria-hidden="true"></div>
+    <div class="title-sign" aria-hidden="true">RETURN TO SENDER<small>NPD Lost &amp; Found</small></div>
+    <div class="baseboard" aria-hidden="true"></div>
+    <div class="floor" aria-hidden="true"></div>
+    <div id="gifts"></div>
+    <div class="leads" id="leads" hidden>
+      <div class="stamp">ALL DELIVERED</div>
+      <h2>Two new leads on the Naughty Chip:</h2>
+      <ol>
+        <li><b>1</b><span>He has a long-sleeve shirt or jacket on.</span></li>
+        <li><b>2</b><span>He has at least one arm outstretched.</span></li>
+      </ol>
+      <button type="button" id="rewrap">Rewrap the presents (replay)</button>
+    </div>
+  </div>
+</div>
+
+<div class="viewer" id="viewer" hidden>
+  <form class="viewer-card" id="viewer-form" novalidate role="dialog" aria-modal="true" aria-labelledby="v-label">
+    <img id="v-img" alt="">
+    <label for="guess" id="v-label">Who is this present for?</label>
+    <input id="guess" autocomplete="off" spellcheck="false" placeholder="Type their name">
+    <div class="msg" id="v-msg" role="status"></div>
+    <div class="row">
+      <button type="button" class="btn btn-back" id="v-back">Back to the presents</button>
+      <button type="submit" class="btn btn-open">OPEN PRESENT</button>
+    </div>
+  </form>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  // Answers are SHA-256 hashes of the name in capital letters with spaces/punctuation removed
+  // and any leading "THE" dropped. `name` is shown on the opened present.
+  const GIFTS = [
+    { img: "tag-01.jpg", name: "Mary Poppins",        ok: ["0fd1884c33175d63aadaaa3aec3ff4c1fc6c5078be2302a16476b7df060064bd"] },
+    { img: "tag-02.jpg", name: "Nicolas Cage",        ok: ["5cd2589ee8ca5e17ea1be3f08e348c8d089895f3da80da51272aa809e1346633", "558a5a08f10ebe82581a0e012448ea684a8a3267f447032dcb65fc757cfd042a", "57ae22e7bba2e13bd5524ca12145ddbc90af4b2c6e24a576284c1b9d3c6544f4"] },
+    { img: "tag-03.jpg", name: "Frosty the Snowman",  ok: ["e0cac464fb3c85652ffe4e5c67a8f3519a8224f6c0c9324c9b232a781d7373a1", "7e8d489cf74287e551695803b28ea7877b4e636bc38990c0511d678e971a87ba", "a35d6a99ee70eb5e55315787ff2ea46ee9de2400cc188c97280b474f67d19981"] },
+    { img: "tag-04.jpg", name: "Oprah Winfrey",       ok: ["ae2d00550a74bfad228d554989bab2babe9eecb092950bb356366ce16a83dd11", "b617918f78cb667c8b64aa3ab56d5590140d952d88a71f8b618f2a35e12dc3c2"] },
+    { img: "tag-05.jpg", name: "Sugar Plum Fairy",    ok: ["d81993c8da25560eaebd437424bc77240ac2ec5558fbd12d1dde63c18831b059"] },
+    { img: "tag-06.jpg", name: "Robert Downey Jr.",   ok: ["2c2df3073b9eb3cafb64b8ac49fc57be97b18f874e5835f58729cf648e40fbdc", "38682454bf1854fffb7bf4978b6ddba95368f06827e3090b29e8a660838fd01c", "94381cfcb0aabff689f34b4adc934f1046ea61792f34342540603273724ad12a"] },
+    { img: "tag-07.jpg", name: "Willy Wonka",         ok: ["ea5251533f95385e857446e64312721136d318bd5cbcbe12da783ce738797397", "7dbb858f0afd34d6fdf78b67828893062e6828eeba4dd65f49c9f4a61b6cffd3"] },
+    { img: "tag-08.jpg", name: "Neil Armstrong",      ok: ["3f1ceb0a80d24ec62d760e7af5259b6f36356d3f06780fcad05b765088e5e411"] },
+    { img: "tag-09.jpg", name: "Julie Andrews",       ok: ["d4a6d9e367ee4bdbf02254b98ee4efba49bcd636993a1a9866b62e3333069d2e"] },
+    { img: "tag-10.jpg", name: "Alex Trebek",         ok: ["e1bf57890898b147e9eb2326f06e8ab7cebfa367c8111e03b0cd9c75c55f31b7"] },
+    { img: "tag-11.jpg", name: "Taylor Swift",        ok: ["9be7d2e1f9c5f13478f1c124a23609e7d665dd65915bf7684156054c27d4fcca"] },
+    { img: "tag-12.jpg", name: "Snoopy",              ok: ["da096b12e10a0703ae33f04b056b82f0c68ab65223759b33276cd111367c9335"] },
+    { img: "tag-13.jpg", name: "Benjamin Franklin",   ok: ["7072b28ffafca0259efa99209f9731b03c4ed7856b6ba17d26d2bb6b939ad862", "4da2c59e2153a8ac00a8b610a0ede6cc672111892a3e5ce4a553e18bd552973f"] },
+    { img: "tag-14.jpg", name: "Rosa Parks",          ok: ["b15a71a1603e5af47ba94401204d62c86eb7a1f05839c229d52f21511a15222f"] }
+  ];
+  // Where each present sits in the room (percent of room) and its wrapping
+  const SPOTS = [
+    { l: 3,  b: 34, w: 10, r: 1.0,  z: 1 }, { l: 16, b: 34, w: 8,  r: 1.25, z: 1 }, { l: 39, b: 34, w: 11, r: 0.8, z: 1 },
+    { l: 55, b: 34, w: 9,  r: 1.1,  z: 1 }, { l: 88, b: 34, w: 10, r: 0.9,  z: 1 },
+    { l: 9,  b: 20, w: 12, r: 0.8,  z: 2 }, { l: 27, b: 20, w: 9,  r: 1.0,  z: 2 }, { l: 42, b: 20, w: 13, r: 0.72, z: 2 },
+    { l: 63, b: 20, w: 10, r: 1.0,  z: 2 }, { l: 76, b: 20, w: 9,  r: 1.2,  z: 2 },
+    { l: 0.5, b: 3, w: 12, r: 0.85, z: 3 }, { l: 17, b: 3,  w: 14, r: 0.7,  z: 3 }, { l: 54, b: 3,  w: 12, r: 0.95, z: 3 },
+    { l: 86, b: 3,  w: 13, r: 0.75, z: 3 }
+  ];
+  const WRAPS = [
+    { c1: "#2a8a4a", rb: "#f4c542", pat: "repeating-linear-gradient(45deg, rgba(255,255,255,.18) 0 4cqw, transparent 4cqw 10cqw)" },
+    { c1: "#1f4fa0", rb: "#f2f2f2", pat: "radial-gradient(circle, rgba(255,255,255,.55) 2cqw, transparent 2.2cqw) 0 0 / 12cqw 12cqw" },
+    { c1: "#f4c542", rb: "#c8203a", pat: "repeating-linear-gradient(-45deg, rgba(200,32,58,.35) 0 3cqw, transparent 3cqw 9cqw)" },
+    { c1: "#e9e2d0", rb: "#2a8a4a", pat: "radial-gradient(circle, rgba(200,32,58,.7) 1.8cqw, transparent 2cqw) 0 0 / 10cqw 10cqw" },
+    { c1: "#7a3fa0", rb: "#f4c542", pat: "repeating-linear-gradient(90deg, rgba(255,255,255,.15) 0 3cqw, transparent 3cqw 8cqw)" },
+    { c1: "#d6283b", rb: "#ffffff", pat: "repeating-linear-gradient(0deg, rgba(255,255,255,.2) 0 3cqw, transparent 3cqw 9cqw)" },
+    { c1: "#1b7a8a", rb: "#ff8ad8", pat: "radial-gradient(circle, rgba(255,255,255,.4) 1.6cqw, transparent 1.8cqw) 0 0 / 9cqw 9cqw" }
+  ];
+  const KEY = "npd_case3_opened_v1";
+  const $ = (id) => document.getElementById(id);
+  const load = () => { try { return new Set(JSON.parse(localStorage.getItem(KEY) || "[]")); } catch (e) { return new Set(); } };
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify([...opened])); } catch (e) {} };
+  let opened = load();
+
+  /* ---------- room decorations ---------- */
+  const lights = $("lights");
+  const NS = "http://www.w3.org/2000/svg";
+  const path = document.createElementNS(NS, "path");
+  let d = "M0,8"; for (let i = 1; i <= 8; i++) d += ` Q${(i - .5) * 125},40 ${i * 125},8`;
+  path.setAttribute("d", d); path.setAttribute("fill", "none"); path.setAttribute("stroke", "#173d22"); path.setAttribute("stroke-width", "2.5");
+  lights.appendChild(path);
+  const cols = ["#ff3b4e", "#f4c542", "#32e07a", "#4fb3ff", "#ff8ad8"];
+  const len = path.getTotalLength();
+  for (let t = 20, k = 0; t < len; t += 38, k++) {
+    const p = path.getPointAtLength(t), e = document.createElementNS(NS, "ellipse");
+    e.setAttribute("cx", p.x); e.setAttribute("cy", p.y + 7); e.setAttribute("rx", 5); e.setAttribute("ry", 8); e.setAttribute("fill", cols[k % cols.length]);
+    lights.appendChild(e);
+  }
+  const win = $("window");
+  for (let i = 0; i < 24; i++) {
+    const f = document.createElement("span"); f.className = "flake";
+    f.style.left = (Math.random() * 100).toFixed(1) + "%"; f.style.top = "-5%";
+    f.style.animationDuration = (3 + Math.random() * 4).toFixed(1) + "s";
+    f.style.animationDelay = (-Math.random() * 6).toFixed(1) + "s";
+    win.appendChild(f);
+  }
+
+  /* ---------- presents ---------- */
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const holder = $("gifts");
+  GIFTS.forEach((g, i) => {
+    const s = SPOTS[i], w = WRAPS[i % WRAPS.length];
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "gift";
+    b.style.cssText = `--l:${s.l}%;--b:${s.b}%;--w:${s.w}%;--r:${s.r};--z:${s.z};--c1:${w.c1};--rb:${w.rb};--pat:${w.pat};`;
+    b.innerHTML = `<span class="box"><span class="inside"></span><span class="tagtie"></span></span>
+      <span class="lid"><span class="bow"></span><span class="knot"></span></span>
+      <span class="label"><small>To:</small>${esc(g.name)}</span>`;
+    b.addEventListener("click", () => { if (!opened.has(i)) openViewer(i); });
+    holder.appendChild(b);
+  });
+
+  function render() {
+    [...holder.children].forEach((b, i) => {
+      const o = opened.has(i);
+      b.classList.toggle("opened", o);
+      b.setAttribute("aria-label", o ? `Present ${i + 1}: opened, for ${GIFTS[i].name}` : `Present ${i + 1}: unopened`);
+      b.setAttribute("aria-disabled", String(o));
+    });
+    $("count").textContent = `${opened.size} of ${GIFTS.length} opened`;
+    $("leads").hidden = opened.size < GIFTS.length;
+  }
+
+  /* ---------- tag viewer ---------- */
+  let current = null, lastFocus = null;
+  function openViewer(i) {
+    current = i; lastFocus = document.activeElement;
+    $("v-img").src = GIFTS[i].img;
+    $("v-img").alt = `Gift tag ${i + 1}: a picture puzzle that spells out who the present is for`;
+    $("guess").value = ""; $("guess").classList.remove("bad"); $("v-msg").textContent = "";
+    $("viewer").hidden = false;
+    $("guess").focus();
+  }
+  function closeViewer() {
+    $("viewer").hidden = true; current = null;
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  $("v-back").addEventListener("click", closeViewer);
+  $("viewer").addEventListener("click", (e) => { if (e.target === $("viewer")) closeViewer(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("viewer").hidden) closeViewer(); });
+  $("guess").addEventListener("input", () => { $("guess").classList.remove("bad"); $("v-msg").textContent = ""; });
+
+  const clean = (s) => s.toUpperCase().replace(/&/g, "AND").replace(/[^A-Z]/g, "").replace(/^THE/, "");
+  async function sha(s) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  $("viewer-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const i = current, input = $("guess");
+    if (i == null) return;
+    const g = clean(input.value);
+    if (!g) { $("v-msg").textContent = "Type a name first."; input.focus(); return; }
+    if (!GIFTS[i].ok.includes(await sha(g))) {
+      input.classList.remove("bad"); void input.offsetWidth; input.classList.add("bad");
+      $("v-msg").textContent = "That's not who this one's for. Try again.";
+      return;
+    }
+    closeViewer();
+    opened.add(i); save(); render();
+    if (opened.size === GIFTS.length) { $("leads").hidden = true; setTimeout(render, 900); }
+  });
+
+  $("rewrap").addEventListener("click", () => { opened = new Set(); save(); render(); });
+
+  render();
+})();
+</script>
+</body>
+</html>
