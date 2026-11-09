@@ -7,7 +7,7 @@ window.GAME_CONFIG = {
   SUBMIT_URL: "https://script.google.com/macros/s/AKfycbwv2n56cB7JoDxPLDoC49fmXXwikY0KBBGtGqObQ3b6wshdjJ6Pkb75mZ71HAlU7Hlo3g/exec",
 
   // Set true while testing to unlock every puzzle regardless of date
-  DEV_UNLOCK_ALL: false,
+  DEV_UNLOCK_ALL: true,
 
   // The 24 suspects. `id` must stay 1–24 (the backend validates this).
   // Rename freely — the name is what shows on the board and in the results sheet.
