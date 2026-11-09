@@ -251,7 +251,7 @@ legend { font-weight: bold; padding: 0 8px; font-size: 18px; }
 .pick[aria-checked="true"] { border-color: var(--red); background: #ffe9ec; opacity: 1; }
 .pick[aria-checked="true"] img { filter: none; }
 .pick[aria-checked="true"]::after {
-  content: "NAUGHTY"; position: absolute; top: 34%; left: 50%;
+  content: "NAUGHTY LIST"; white-space: nowrap; position: absolute; top: 34%; left: 50%;
   transform: translate(-50%, -50%) rotate(-12deg);
   background: var(--red); color: #fff; font-size: 11px; padding: 2px 6px; letter-spacing: .1em; border-radius: 3px;
 }

@@ -300,7 +300,7 @@
     const err = $("#form-error");
     const name = $("#f-name").value.trim().replace(/\s+/g, " ");
     const email = $("#f-email").value.trim().toLowerCase();
-    if (!selectedId) { err.textContent = "Pick the Chip you think is Naughty."; return; }
+    if (!selectedId) { err.textContent = "Pick the Chip you think is on the Naughty List."; return; }
     if (name.length < 2) { err.textContent = "Please enter your full name."; return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = "Please enter a valid email address."; return; }
     err.textContent = "";
@@ -309,7 +309,7 @@
     openModal({
       title: "Final answer?",
       body: `<div class="confirm-chip"><img src="${esc(chip.img)}" alt="">
-               <p>You're accusing <b>${esc(chip.name)}</b> of being this year's Naughty Chip.<br><br>
+               <p>You're accusing <b>${esc(chip.name)}</b> of being on this year's Naughty List.<br><br>
                Detective: <b>${esc(name)}</b><br>${esc(email)}<br><br>
                <b>This can't be changed.</b></p></div>`,
       actions: [
