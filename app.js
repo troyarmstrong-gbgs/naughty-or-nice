@@ -40,7 +40,11 @@
     document.querySelectorAll(".scene").forEach((s) => (s.hidden = s.dataset.scene !== name));
     closeModal();
     window.scrollTo(0, 0);
-    if (name === "board") { renderBoard(); requestAnimationFrame(drawString); }
+    if (name === "board") {
+      renderBoard();
+      requestAnimationFrame(() => { fitNames(); drawString(); });
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitNames(); drawString(); });
+    }
     if (name === "accuse") renderAccuse();
     if (name === "computer") renderCases();
     setMusic(name);
@@ -185,7 +189,7 @@
         `<span class="pin"></span>
          <span class="num">#${String(c.id).padStart(2, "0")}</span>
          <span class="mug"><img src="${esc(c.img)}" alt="" loading="lazy"></span>
-         <span class="tag">${esc(c.name)}</span>
+         <span class="tag"><span>${esc(c.name)}</span></span>
          <span class="stamp">NICE</span>`);
       b.addEventListener("click", () => {
         if (niceSet.has(c.id)) niceSet.delete(c.id); else niceSet.add(c.id);
@@ -210,7 +214,19 @@
     $("#reset-board").addEventListener("click", () => {
       niceSet.clear(); saveNice(); renderBoard(); drawString();
     });
-    window.addEventListener("resize", () => { if (!$("#scene-board").hidden) drawString(); });
+    window.addEventListener("resize", () => { if (!$("#scene-board").hidden) { fitNames(); drawString(); } });
+  }
+
+  // Make each Chip's name as big as possible while still fitting under its photo
+  function fitNames() {
+    grid.querySelectorAll(".polaroid .tag").forEach((box) => {
+      const txt = box.firstElementChild;
+      if (!box.clientWidth) return;
+      for (let size = 19; size >= 7; size -= 0.5) {
+        box.style.fontSize = size + "cqw";
+        if (txt.offsetHeight <= box.clientHeight && txt.scrollWidth <= box.clientWidth) return;
+      }
+    });
   }
 
   function renderBoard() {

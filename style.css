@@ -195,7 +195,10 @@ a { color: inherit; }
   overflow: hidden;
 }
 .mug img { width: 86%; height: 92%; object-fit: contain; object-position: bottom; display: block; transition: filter .25s, opacity .25s; }
-.polaroid .tag { display: block; font-family: "Permanent Marker", cursive; font-size: clamp(10px, 1.15vw, 14px); margin-top: 5px; line-height: 1.1; min-height: 2.2em; display: flex; align-items: center; justify-content: center; text-align: center; }
+/* Name area under each mugshot: JS grows each name as large as it can while fitting this box (max 2 lines) */
+.polaroid { container-type: inline-size; }
+.polaroid .tag { font-family: "Permanent Marker", cursive; font-size: 12cqw; margin-top: 4cqw; line-height: 1.02; height: 27cqw; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
+.polaroid .tag > span { display: block; width: 100%; text-wrap: balance; overflow-wrap: normal; word-break: keep-all; }
 .polaroid .num { position: absolute; top: 10px; left: 11px; font-size: 10px; background: rgba(255,255,255,.8); padding: 1px 4px; color: #333; }
 
 .polaroid.nice .mug img { filter: grayscale(1); opacity: .45; }
