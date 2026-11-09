@@ -3,8 +3,8 @@
    ========================================================== */
 window.GAME_CONFIG = {
   // Paste your Google Apps Script Web App URL here after deploying backend/Code.gs
-  // e.g. "https://script.google.com/macros/s/AKfycbwv2n56cB7JoDxPLDoC49fmXXwikY0KBBGtGqObQ3b6wshdjJ6Pkb75mZ71HAlU7Hlo3g/exec"
-  SUBMIT_URL: "",
+  // e.g. "https://script.google.com/macros/s/AKfy.../exec"
+  SUBMIT_URL: "https://script.google.com/macros/s/AKfycbwv2n56cB7JoDxPLDoC49fmXXwikY0KBBGtGqObQ3b6wshdjJ6Pkb75mZ71HAlU7Hlo3g/exec",
 
   // Set true while testing to unlock every puzzle regardless of date
   DEV_UNLOCK_ALL: true,
@@ -41,9 +41,9 @@ window.GAME_CONFIG = {
   // Puzzles on the computer. `unlock` is a local date (YYYY-MM-DD); the file unlocks at midnight.
   // Later: set `url` to a puzzle page (e.g. "puzzles/puzzle-1.html") and it will open in the viewer.
   PUZZLES: [
-    { id: 1, title: "Case File #1", subtitle: "Code Crackers", unlock: "2026-11-30", url: "puzzles/case-1/index.html" },
-    { id: 2, title: "Case File #2", subtitle: "Synonym Cookies", unlock: "2026-12-07", url: "puzzles/case-2/index.html" },
-    { id: 3, title: "Case File #3", subtitle: "Return to Sender", unlock: "2026-12-14", url: "puzzles/case-3/index.html" },
-    { id: 4, title: "Case File #4", subtitle: "Quite the ADVENT-ure", unlock: "2026-12-21", url: "https://skywardharmony.com/adventhome", external: true }
+    { id: 1, title: "Case File #1", subtitle: "Code Crackers", unlock: "2026-12-01", url: "puzzles/case-1/index.html" },
+    { id: 2, title: "Case File #2", subtitle: "Synonym Cookies", unlock: "2026-12-08", url: "puzzles/case-2/index.html" },
+    { id: 3, title: "Case File #3", subtitle: "Return to Sender", unlock: "2026-12-15", url: "puzzles/case-3/index.html" },
+    { id: 4, title: "Case File #4", subtitle: "Quite the ADVENT-ure", unlock: "2026-12-22", url: "https://skywardharmony.com/adventhome", external: true }
   ]
 };
