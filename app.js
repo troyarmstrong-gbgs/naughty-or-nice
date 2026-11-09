@@ -360,10 +360,11 @@
      COMPUTER / PUZZLES
      ========================================================= */
   function unlockDate(p) {
+    if (!p.unlock) return null;            // no date = always open
     const [y, m, d] = p.unlock.split("-").map(Number);
     return new Date(y, m - 1, d, 0, 0, 0);
   }
-  function isUnlocked(p) { return CFG.DEV_UNLOCK_ALL || (CFG.NOW ? new Date(CFG.NOW) : new Date()) >= unlockDate(p); }
+  function isUnlocked(p) { const d = unlockDate(p); return CFG.DEV_UNLOCK_ALL || !d || (CFG.NOW ? new Date(CFG.NOW) : new Date()) >= d; }
 
   const ICON_LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="11" width="16" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
   const ICON_FOLDER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M3 6h7l2 2h9v11H3z"/></svg>';
@@ -372,7 +373,7 @@
     list.innerHTML = "";
     CFG.PUZZLES.forEach((p) => {
       const open = isUnlocked(p);
-      const when = unlockDate(p).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+      const when = unlockDate(p) ? unlockDate(p).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "";
       const li = el("li");
       // Unlocked external case files are real links so they open in a new tab/window everywhere
       const b = open && p.external

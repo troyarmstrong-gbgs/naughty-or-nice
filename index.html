@@ -1,195 +1,255 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Naughty or Nice? | North Pole-ice Department</title>
-  <meta name="description" content="Help the North Pole-ice Department find out which Chip is Naughty this year.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Permanent+Marker&family=VT323&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case File #1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --navy: #10408f;
+    --ink: #1d1838;
+    --pink: #ff5478;
+    --yellow: #fdeb77;
+    --gold: #f4c542;
+    --paper: #f7f3e8;
+    --green: #1f8a4c;
+    --red: #c8203a;
+    --font-type: "Special Elite", "Courier New", monospace;
+    --font-cond: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-type); }
+  [hidden] { display: none !important; }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 10px 16px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .head h1 { margin: 0; font-size: clamp(18px, 2.6vw, 26px); }
+  .steps { display: flex; gap: 6px; }
+  .steps span { width: 34px; height: 8px; border-radius: 4px; background: rgba(29,24,56,.18); }
+  .steps span.is-done { background: var(--green); }
+  .steps span.is-now { background: var(--red); }
+  .hint { margin: 0; font-size: 14px; }
+
+  /* Sized by whichever runs out first, width or height, so the whole puzzle + SUBMIT fit with no scrollbar */
+  .stage { position: relative; container-type: inline-size; aspect-ratio: 1921 / 1081; width: min(100%, calc((100dvh - 190px) * 1921 / 1081)); min-width: 260px; max-width: 100%; margin: 0 auto; border-radius: 6px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+  .stage img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+  .slot {
+    position: absolute; transform: translate(-50%, -50%);
+    width: 16.5%;
+    font-family: var(--font-cond); font-weight: 700; text-transform: uppercase; text-align: center;
+    font-size: 2.9cqw; letter-spacing: .04em; line-height: 1;
+    padding: .25em .2em;
+    border-radius: .3em;
+    border: .18cqw solid rgba(255,255,255,.9);
+    background: rgba(255,255,255,.92);
+    color: var(--navy);
+    outline: none;
+  }
+  .slot::placeholder { color: rgba(16,64,143,.4); }
+  .slot:focus { box-shadow: 0 0 0 .4cqw var(--gold); }
+  .slot.mid { background: transparent; border-color: transparent; color: var(--yellow); font-size: 3.4cqw; width: 15.4%; }
+  .slot.mid::placeholder { color: rgba(253,235,119,.45); }
+  .slot.mid:focus { box-shadow: none; border-color: rgba(253,235,119,.6); }
+  .slot.ok { background: #dff5e7; color: var(--green); border-color: var(--green); }
+  .slot.mid.ok { background: transparent; color: #7dffb0; border-color: transparent; }
+  .slot.bad { border-color: var(--red); box-shadow: 0 0 0 .3cqw rgba(200,32,58,.5); animation: shake .35s; }
+  @keyframes shake { 25% { margin-left: -.5cqw; } 75% { margin-left: .5cqw; } }
+  @media (prefers-reduced-motion: reduce) { .slot.bad { animation: none; } }
+
+  .s-top   { left: 25.6%; top: 33.5%; }
+  .s-left  { left: 10.2%; top: 83%; }
+  .s-right { left: 41.1%; top: 83%; }
+  .s-mid   { left: 25.6%; top: 59.6%; }
+
+  .bar { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .msg { min-height: 1.4em; font-weight: bold; text-align: center; }
+  .msg.bad { color: var(--red); }
+  .msg.ok { color: var(--green); }
+  .btn {
+    font-family: var(--font-type); font-size: 20px; letter-spacing: .08em;
+    background: var(--red); color: #fff; border: 2px solid #fff; border-radius: 8px;
+    padding: 12px 30px; cursor: pointer; box-shadow: 0 4px 0 #8c1426;
+  }
+  .btn:hover { background: #dc2c47; }
+  .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #8c1426; }
+  .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+  .btn.green { background: var(--green); box-shadow: 0 4px 0 #125a30; }
+
+  /* congrats */
+  .done { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 18px 0 10px; }
+  .done .stamp { border: 4px solid var(--green); color: var(--green); font-size: clamp(22px, 4vw, 34px); letter-spacing: .14em; padding: 4px 18px; transform: rotate(-4deg); border-radius: 6px; }
+  .done h2 { margin: 0; font-size: clamp(22px, 3.4vw, 32px); text-wrap: balance; }
+  .leads { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; width: min(560px, 100%); }
+  .leads li { display: flex; gap: 14px; align-items: center; text-align: left; background: #fff; border: 2px dashed rgba(29,24,56,.3); border-radius: 10px; padding: 14px 16px; font-size: clamp(16px, 2.2vw, 20px); }
+  .leads b { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--red); color: #fff; }
+  .small { font-size: 14px; opacity: .75; }
+  .link { background: none; border: none; font: inherit; text-decoration: underline; cursor: pointer; color: inherit; }
+</style>
 </head>
 <body>
-
-  <!-- ============ SCENE: OFFICE ============ -->
-  <section id="scene-office" class="scene" data-scene="office">
-    <div class="stage office-stage">
-      <img class="stage-bg" src="assets/office.jpg" alt="The North Pole-ice Department office at night">
-      <svg class="stage-overlay" id="office-overlay" viewBox="0 0 2000 1286" preserveAspectRatio="none" aria-hidden="false">
-        <defs>
-          <clipPath id="window-clip"><polygon points="138,200 410,262 410,665 208,690"/></clipPath>
-          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
-        <g id="deco-snow" clip-path="url(#window-clip)"></g>
-        <g id="deco-lights"></g>
-        <g id="deco-static"></g>
-
-        <!-- Secret: invisible hit area over the clock (plays a sound, no hover cue) -->
-        <circle id="clock-secret" cx="938" cy="268" r="64" fill="transparent" style="pointer-events: all; cursor: default"/>
-
-        <!-- Secret: invisible hit area over the window (plays snow SFX, no hover cue) -->
-        <polygon id="window-secret" points="138,200 410,262 410,665 208,690" fill="transparent" style="pointer-events: all; cursor: default"/>
-
-        <!-- Secret: invisible hit area over the desk lamp (plays SFX, no hover cue) -->
-        <polygon id="lamp-secret" points="665,585 850,585 850,705 780,705 795,880 675,880 705,705 665,705" fill="transparent" style="pointer-events: all; cursor: default"/>
-
-        <!-- Secret: invisible hit area over the trash can (plays SFX, no hover cue) -->
-        <polygon id="trash-secret" points="1660,1045 1858,1045 1838,1262 1688,1262" fill="transparent" style="pointer-events: all; cursor: default"/>
-
-        <!-- Secret: invisible hit area over the Christmas tree + presents (plays SFX, no hover cue) -->
-        <polygon id="tree-secret" points="300,835 398,1075 398,1136 204,1136 204,1075" fill="transparent" style="pointer-events: all; cursor: default"/>
-
-        <!-- Secret: invisible hit area over the door on the right (plays SFX, no hover cue) -->
-        <polygon id="door-secret" points="1650,255 1908,198 1918,1012 1650,935" fill="transparent" style="pointer-events: all; cursor: default"/>
-
-        <!-- Clickable hotspots -->
-        <a href="#board" class="hotspot" aria-label="Open the suspect board">
-          <polygon points="1325,322 1606,294 1606,726 1325,706"/>
-        </a>
-        <a href="#computer" class="hotspot" aria-label="Open the computer case files">
-          <polygon points="1055,616 1410,616 1410,850 1055,850"/>
-        </a>
-      </svg>
-
-      <a href="#board" class="hotspot-label" style="left:76%;top:57.5%">Suspect Board</a>
-      <a href="#computer" class="hotspot-label" style="left:61.6%;top:68%">Case Files</a>
-
-      <header class="office-title">
-        <div class="badge">NPD</div>
-        <div>
-          <h1>Naughty or Nice?</h1>
-          <p>North Pole-ice Department &middot; Which Chip is <span class="naughty">Naughty</span> this year?</p>
-          <button type="button" class="briefing-link" id="open-briefing">Mission briefing</button>
-        </div>
-      </header>
-    </div>
-  </section>
-
-  <!-- ============ SCENE: SUSPECT BOARD ============ -->
-  <section id="scene-board" class="scene" data-scene="board" hidden>
-    <div class="scene-wrap">
-      <div class="topbar">
-        <a href="#office" class="btn btn-ghost">&larr; Back to office</a>
-        <div class="counter" id="suspect-counter">24 suspects remaining</div>
-        <button class="btn btn-ghost" id="reset-board" type="button">Reset board</button>
-      </div>
-
-      <div class="board-frame">
-        <svg class="garland" viewBox="0 0 1000 60" preserveAspectRatio="none" aria-hidden="true" id="board-garland"></svg>
-        <div class="board-inner">
-          <div class="board-label">MOST WANTED</div>
-          <p class="board-hint">Click a suspect to clear them as <b>NICE</b>. Click again to put them back on the list.</p>
-          <div class="suspect-grid-wrap">
-            <svg class="string-layer" id="string-layer" aria-hidden="true"></svg>
-            <div class="suspect-grid" id="suspect-grid"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="board-actions">
-        <a href="#accuse" class="btn btn-primary btn-big">SUBMIT GUESS</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SCENE: SUBMIT GUESS ============ -->
-  <section id="scene-accuse" class="scene" data-scene="accuse" hidden>
-    <div class="scene-wrap">
-      <div class="topbar">
-        <a href="#board" class="btn btn-ghost">&larr; Back to board</a>
-        <div></div><div></div>
-      </div>
-
-      <div class="paper">
-        <div class="paper-head">
-          <div class="stamp-small">OFFICIAL</div>
-          <h2>Naughty Chip Accusation Form</h2>
-          <p>Choose the Chip you believe is Naughty. <b>You only get one guess</b> &mdash; make it count, detective.</p>
-        </div>
-
-        <div id="accuse-closed" class="notice" hidden></div>
-
-        <form id="accuse-form" novalidate>
-          <fieldset class="lineup">
-            <legend>1. Select your suspect</legend>
-            <div class="lineup-grid" id="lineup-grid" role="radiogroup" aria-label="Suspects"></div>
-          </fieldset>
-
-          <fieldset class="detective">
-            <legend>2. Detective details</legend>
-            <label>Full name
-              <input type="text" id="f-name" name="name" autocomplete="name" maxlength="80" required>
-            </label>
-            <label>Email
-              <input type="email" id="f-email" name="email" autocomplete="email" maxlength="120" required>
-            </label>
-          </fieldset>
-
-          <div class="form-error" id="form-error" role="alert"></div>
-          <button type="submit" class="btn btn-primary btn-big" id="submit-btn">SUBMIT GUESS</button>
-          <p class="fine">One submission per name and email. Submissions are final.</p>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SCENE: COMPUTER ============ -->
-  <section id="scene-computer" class="scene" data-scene="computer" hidden>
-    <div class="stage computer-stage">
-      <img class="stage-bg" src="assets/computer.jpg" alt="Police computer terminal">
-      <div class="screen">
-        <div class="screen-head">
-          <span>PASSWORD VERIFIED</span>
-          <span class="blink">_</span>
-        </div>
-        <div class="screen-sub">NPD SECURE TERMINAL &middot; RECENT CASE FILES</div>
-        <ul class="case-list" id="case-list"></ul>
-      </div>
-      <a href="#office" class="btn btn-ghost stage-back">&larr; Back to office</a>
-    </div>
-  </section>
-
-  <!-- ============ OPENING GATE: one click unlocks sound, then the briefing appears ============ -->
-  <div class="gate" id="gate">
-    <div class="gate-inner">
-      <div class="gate-badge">NPD</div>
-      <div class="gate-kicker">North Pole-ice Department</div>
-      <h1 class="gate-title">Naughty or Nice?</h1>
-      <button type="button" class="btn btn-primary btn-big" id="gate-open">OPEN THE CASE</button>
-      <p class="gate-note">Sound on for the full experience</p>
-    </div>
+<div class="wrap">
+  <div class="head">
+    <h1 id="title">Case File #1</h1>
+    <div class="steps" id="steps" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
   </div>
 
-  <!-- ============ MISSION BRIEFING (shows when the game opens) ============ -->
-  <div class="briefing" id="briefing" hidden>
-    <div class="briefing-card" role="dialog" aria-modal="true" aria-labelledby="briefing-title">
-      <img class="briefing-chip" src="assets/chip-briefing.png" alt="Chip, looking tired, holding a coffee mug over a spilled puddle of coffee">
-      <div class="briefing-text">
-        <div class="briefing-kicker">North Pole-ice Department &middot; Mission Briefing</div>
-        <h2 id="briefing-title">Naughty or Nice?</h2>
-        <p>Help the North Pole-ice Department catch which Chip has been <b class="naughty-red">Naughty</b> this year!</p>
-        <p>Solve the puzzles to get clues from eyewitnesses about which Chip did it!</p>
-        <p class="briefing-warn">You only get <b>ONE</b> submission. You may submit a guess early, <b>BUT</b> know that is your only shot to guess. So <b>CHOOSE WISELY!</b> The first 3 GMs to correctly guess the culprit will get a prize!</p>
-        <button type="button" class="btn btn-primary btn-big" id="close-briefing">START INVESTIGATING</button>
-      </div>
+  <section id="play">
+    <div class="wrap" style="padding:0">
+      <p class="hint">Use the key to decode each pink hexagon, then figure out what the three words have in common and write it in the middle.</p>
+      <form id="form" novalidate>
+        <div class="stage">
+          <img id="img" alt="">
+          <input class="slot s-top"   id="a-top"   autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="?" aria-label="Top hexagon">
+          <input class="slot s-left"  id="a-left"  autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="?" aria-label="Bottom-left hexagon">
+          <input class="slot s-right" id="a-right" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="?" aria-label="Bottom-right hexagon">
+          <input class="slot mid s-mid" id="a-mid" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="?" aria-label="Middle answer: what they have in common">
+        </div>
+        <div class="bar" style="margin-top:8px">
+          <div class="msg" id="msg" role="status"></div>
+          <button class="btn" type="submit" id="submit">SUBMIT</button>
+        </div>
+      </form>
     </div>
-  </div>
+  </section>
 
-  <!-- ============ MODAL ============ -->
-  <div class="modal" id="modal" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <button class="modal-x" id="modal-x" type="button" aria-label="Close">&times;</button>
-      <h3 id="modal-title"></h3>
-      <div id="modal-body"></div>
-      <div class="modal-actions" id="modal-actions"></div>
-    </div>
-  </div>
+  <section id="between" class="done" hidden>
+    <div class="stamp">CRACKED</div>
+    <h2 id="between-title">Puzzle solved!</h2>
+    <button class="btn green" type="button" id="next">NEXT PUZZLE</button>
+  </section>
 
-  <script src="config.js"></script>
-  <script src="audio.js"></script>
-  <script src="app.js"></script>
+  <section id="final" class="done" hidden>
+    <div class="stamp">CASE FILE CLOSED</div>
+    <h2>Great work, Detective! You cracked all four codes.</h2>
+    <p>The North Pole-ice Department has two new leads on the Naughty Chip:</p>
+    <ol class="leads">
+      <li><b>1</b><span>He's <strong>not</strong> wearing glasses.</span></li>
+      <li><b>2</b><span>He has <strong>two arms</strong> visible.</span></li>
+    </ol>
+    <p class="small">Head back to the Suspect Board and clear anyone who doesn't fit.</p>
+    <button class="link small" type="button" id="replay">Replay this case file</button>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  // Answers stored as SHA-256 hashes so they can't be read from the page source.
+  // Each slot lists every accepted spelling.
+  const PUZZLES = [
+    { img: "puzzle-1.jpg", alt: "Pigpen cipher puzzle: three coded hexagons around 'Things you ___'",
+      top:   ["aa753e9816ed22e9b7babd0ffa863b9c26b36b42dbc20ac66bf16ef51e0edc79"],
+      left:  ["e14a7e697577c62408de457366961015605700b5c28c86db21663fd2d5a0025c"],
+      right: ["69a99fd1baf0097fcafbd697c0ab53cbae281f9889a5f69fc6304f732193734c"],
+      mid:   ["9e268f3923fd0a4c5591a7cfb0688e5b894b3dcda47eff8bf8ada48f645de1f7"] },
+    { img: "puzzle-2.jpg", alt: "Morse code puzzle: three coded hexagons around 'Things that ___'",
+      top:   ["d426b95100fa5dd15515ae395e5012a6f26c45ccd0ad3b91166fa424b45a2d4c", "0a52262a2a16170bca59a9a58e4fe78b33b3a8f8c2bd0ba61e6aecee13a878ce"],
+      left:  ["831a73a68b11ec563ed784643d022a9f3cf6ca0ff7b8589ff50622c7d3cfeee0"],
+      right: ["21b04fab319f57c9ab68d5f246a5b6a07145b960907bd327d2dc77534395be69", "9789620cbb805829f9c4dae0a345fa8d08718677735090e06b4f97768077b98c"],
+      mid:   ["bd5dea8d46e0fdc5fcc958ae8aacf7250d86177dfda5b06fb62e5e3c59ce1fd7"] },
+    { img: "puzzle-3.jpg", alt: "Morse code puzzle: three coded hexagons around 'Things with ___'",
+      top:   ["19beaf65f757136dd0becdfaddd3e484db3478f0c779311ed773d875320c91ea"],
+      left:  ["cb375537532fa8d20b1f995aef31984c15113e27ba1cd13f844c0dcb0d043787"],
+      right: ["f848e86c8a8a1000f72149f95cafd841d970ae5744f12e9ad0978e2f5e61e83b"],
+      mid:   ["bd0f6d31f855c9ee9e9a2dc5fce6039c1bb2589001a483d76d0accfbaee772d9"] },
+    { img: "puzzle-4.jpg", alt: "Letter-shift (ROT13) puzzle: three coded hexagons around 'Things that ___'",
+      top:   ["b6a6a428372fa9bff5a95c1bf4c7b8bd3b07ca07b6b61f8582fa90e4b0960033"],
+      left:  ["95054af7090aeccac9885af3b11c849534c7016af3cc3ddf7ae02986985a21f3"],
+      right: ["a430e6d293d0f1d5c9ec2e3ecd08eb143e053deb9532d1f8ce332fe05d119846"],
+      mid:   ["324f5adc014e7b15fd6a32a278e9aa76dc2c8e255e8e85ab9f4c205759482b93"] }
+  ];
+  const SLOTS = ["top", "left", "right", "mid"];
+  const KEY = "npd_case1_progress_v1";
+
+  const $ = (id) => document.getElementById(id);
+  const load = () => { try { return Number(localStorage.getItem(KEY)) || 0; } catch (e) { return 0; } };
+  const save = (n) => { try { localStorage.setItem(KEY, String(n)); } catch (e) {} };
+
+  let step = Math.min(load(), PUZZLES.length);
+
+  async function sha(s) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  const clean = (s) => s.toUpperCase().replace(/[^A-Z]/g, "");
+
+  function show(which) {
+    $("play").hidden = which !== "play";
+    $("between").hidden = which !== "between";
+    $("final").hidden = which !== "final";
+    [...$("steps").children].forEach((s, i) => {
+      s.className = i < step ? "is-done" : (i === step && which === "play" ? "is-now" : "");
+    });
+  }
+
+  function render() {
+    if (step >= PUZZLES.length) {
+      $("title").textContent = "Case File #1 · Solved";
+      show("final");
+      return;
+    }
+    const p = PUZZLES[step];
+    $("title").textContent = `Case File #1 · Puzzle ${step + 1} of ${PUZZLES.length}`;
+    $("img").src = p.img;
+    $("img").alt = p.alt;
+    SLOTS.forEach((k) => { const el = $("a-" + k); el.value = ""; el.className = el.className.replace(/\s?(ok|bad)/g, ""); el.readOnly = false; });
+    $("msg").textContent = ""; $("msg").className = "msg";
+    show("play");
+  }
+
+  $("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const p = PUZZLES[step];
+    const msg = $("msg");
+    const empty = SLOTS.filter((k) => !clean($("a-" + k).value));
+    if (empty.length) {
+      msg.textContent = "Fill in all four spaces before submitting.";
+      msg.className = "msg bad";
+      $("a-" + empty[0]).focus();
+      return;
+    }
+    let right = 0;
+    for (const k of SLOTS) {
+      const el = $("a-" + k);
+      el.classList.remove("ok", "bad");
+      void el.offsetWidth; // restart shake animation
+      const good = p[k].includes(await sha(clean(el.value)));
+      el.classList.add(good ? "ok" : "bad");
+      el.readOnly = false;
+      if (good) right++;
+    }
+    if (right === SLOTS.length) {
+      SLOTS.forEach((k) => ($("a-" + k).readOnly = true));
+      msg.textContent = "All four correct!";
+      msg.className = "msg ok";
+      step++;
+      save(step);
+      setTimeout(() => {
+        if (step >= PUZZLES.length) { render(); return; }
+        $("between-title").textContent = `Puzzle ${step} of ${PUZZLES.length} solved!`;
+        show("between");
+        $("next").focus();
+      }, 700);
+    } else {
+      msg.textContent = `${right} of 4 correct. The red spaces need another look.`;
+      msg.className = "msg bad";
+    }
+  });
+
+  // Typing in a red box clears its red state
+  SLOTS.forEach((k) => $("a-" + k).addEventListener("input", (e) => e.target.classList.remove("bad")));
+
+  $("next").addEventListener("click", render);
+  $("replay").addEventListener("click", () => { step = 0; save(0); render(); });
+
+  render();
+})();
+</script>
 </body>
 </html>
