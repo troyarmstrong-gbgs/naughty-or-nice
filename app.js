@@ -378,8 +378,20 @@
      ========================================================= */
   function unlockDate(p) {
     if (!p.unlock) return null;            // no date = always open
-    const [y, m, d] = p.unlock.split("-").map(Number);
+    if (p.unlock.includes("T")) return new Date(p.unlock);   // exact moment, e.g. 2026-12-07T09:00:00-06:00
+    const [y, m, d] = p.unlock.split("-").map(Number);      // plain date = player's local midnight
     return new Date(y, m - 1, d, 0, 0, 0);
+  }
+  // Shown in Central time for everyone, e.g. "Dec 7, 9 AM CT"
+  function unlockLabel(p) {
+    const d = unlockDate(p);
+    if (!d) return "";
+    if (!p.unlock.includes("T")) return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    try {
+      const day = d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/Chicago" });
+      const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/Chicago" }).replace(":00", "");
+      return `${day}, ${time} CT`;
+    } catch (e) { return d.toLocaleString(); }
   }
   function isUnlocked(p) { const d = unlockDate(p); return CFG.DEV_UNLOCK_ALL || !d || (CFG.NOW ? new Date(CFG.NOW) : new Date()) >= d; }
 
@@ -390,7 +402,7 @@
     list.innerHTML = "";
     CFG.PUZZLES.forEach((p) => {
       const open = isUnlocked(p);
-      const when = unlockDate(p) ? unlockDate(p).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "";
+      const when = unlockLabel(p);
       const li = el("li");
       // Unlocked external case files are real links so they open in a new tab/window everywhere
       const b = open && p.external

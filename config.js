@@ -7,7 +7,7 @@ window.GAME_CONFIG = {
   SUBMIT_URL: "https://script.google.com/macros/s/AKfycbwv2n56cB7JoDxPLDoC49fmXXwikY0KBBGtGqObQ3b6wshdjJ6Pkb75mZ71HAlU7Hlo3g/exec",
 
   // Set true while testing to unlock every puzzle regardless of date
-  DEV_UNLOCK_ALL: true,
+  DEV_UNLOCK_ALL: false,
 
   // The 24 suspects. `id` must stay 1–24 (the backend validates this).
   // Rename freely — the name is what shows on the board and in the results sheet.
@@ -38,13 +38,14 @@ window.GAME_CONFIG = {
     { id: 24, name: "Santa Chip",        img: "assets/chips/chip-24.png" }
   ],
 
-  // Puzzles on the computer. `unlock` is a local date (YYYY-MM-DD); the file unlocks at midnight.
+  // Puzzles on the computer. `unlock` is the exact moment the file opens for everyone:
+  // "2026-12-07T09:00:00-06:00" = Dec 7, 9:00 AM Central (-06:00 is Central Standard Time).
   // Use unlock: null for a case file that is always open.
   // Later: set `url` to a puzzle page (e.g. "puzzles/puzzle-1.html") and it will open in the viewer.
   PUZZLES: [
-    { id: 1, title: "Case File #1", subtitle: "Code Crackers", unlock: null, url: "puzzles/case-1/index.html" },
-    { id: 2, title: "Case File #2", subtitle: "Synonym Cookies", unlock: "2026-12-08", url: "puzzles/case-2/index.html" },
-    { id: 3, title: "Case File #3", subtitle: "Return to Sender", unlock: "2026-12-15", url: "puzzles/case-3/index.html" },
-    { id: 4, title: "Case File #4", subtitle: "Quite the ADVENT-ure", unlock: "2026-12-22", url: "https://skywardharmony.com/adventhome", external: true }
+    { id: 1, title: "Case File #1", subtitle: "Code Crackers", unlock: "2026-12-07T09:00:00-06:00", url: "puzzles/case-1/index.html" },
+    { id: 2, title: "Case File #2", subtitle: "Synonym Cookies", unlock: "2026-12-14T09:00:00-06:00", url: "puzzles/case-2/index.html" },
+    { id: 3, title: "Case File #3", subtitle: "Return to Sender", unlock: "2026-12-21T09:00:00-06:00", url: "puzzles/case-3/index.html" },
+    { id: 4, title: "Case File #4", subtitle: "Quite the ADVENT-ure", unlock: "2026-12-28T09:00:00-06:00", url: "https://skywardharmony.com/adventhome", external: true }
   ]
 };
