@@ -302,7 +302,7 @@
       closed.innerHTML = `<h3>Thank you for your selection!</h3>
         ${chip ? `<img src="${esc(chip.img)}" alt="">` : ""}
         <p>Detective <b>${esc(done.name)}</b>, your accusation of <b>${esc(chip ? chip.name : "a suspect")}</b> is on file.</p>
-        <p>The North Pole-ice Department will be in contact with you soon.</p>
+        <p>The North Police Department will be in contact with you soon.</p>
         <p><a href="#office" class="btn btn-primary">Back to the office</a></p>`;
       return;
     }
@@ -368,7 +368,7 @@
       }
     } catch (ex) {
       closeModal();
-      err.textContent = "Couldn't reach the North Pole-ice server. Check your connection and try again.";
+      err.textContent = "Couldn't reach the North Police server. Check your connection and try again.";
     }
   }
 
