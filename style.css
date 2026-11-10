@@ -341,6 +341,39 @@ a.case { text-decoration: none; }
 .gate-title { margin: 0 0 8px; font-size: clamp(38px, 8vw, 72px); line-height: 1; color: #fff; text-shadow: 0 4px 0 var(--red-dark); }
 .gate-note { margin: 0; font-size: 13px; color: rgba(255,255,255,.6); }
 
+/* ---------- Rotate prompt (phones held upright) ---------- */
+.rotate { display: none; }
+@media (orientation: portrait) and (max-width: 700px) {
+  body[data-scene="office"]:not(.intro-open):not(.rotate-dismissed) .rotate,
+  body[data-scene="computer"]:not(.intro-open):not(.rotate-dismissed) .rotate,
+  body.puzzle-open:not(.rotate-dismissed) .rotate {
+    position: fixed; inset: 0; z-index: 90;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px));
+    background: radial-gradient(ellipse at center, #13233f, #060b16 80%);
+    color: #fff; text-align: center;
+  }
+}
+.rotate-inner { max-width: 320px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.rotate-inner h2 { margin: 0; color: var(--gold); font-size: 28px; }
+.rotate-inner p { margin: 0; font-size: 16px; line-height: 1.45; color: rgba(255,255,255,.85); }
+.rotate-phone {
+  width: 56px; height: 96px; border: 4px solid var(--gold); border-radius: 12px; position: relative;
+  animation: rotate-hint 2.4s ease-in-out infinite;
+}
+.rotate-phone span { position: absolute; left: 50%; bottom: 6px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--gold); }
+@keyframes rotate-hint { 0%, 25% { transform: rotate(0deg); } 55%, 80% { transform: rotate(-90deg); } 100% { transform: rotate(0deg); } }
+@media (prefers-reduced-motion: reduce) { .rotate-phone { animation: none; transform: rotate(-90deg); } }
+.rotate-skip { margin-top: 6px; background: none; border: 0; color: rgba(255,255,255,.6); font: inherit; font-size: 14px; text-decoration: underline; cursor: pointer; }
+
+/* Office name box: on narrow screens keep just the title + briefing button so it doesn't cover the desk */
+@container (max-width: 640px) {
+  .office-title { left: 1.5cqw; bottom: 1.5cqw; padding: 1cqw 1.6cqw; gap: 0; max-width: none; }
+  .office-title .badge, .office-title p { display: none; }
+  .office-title h1 { font-size: 3.4cqw; }
+  .office-title .briefing-link { font-size: 2.4cqw; margin-top: .3em; }
+}
+
 /* ---------- Mission briefing ---------- */
 .briefing-link {
   margin-top: .5em; padding: .2em .7em; font-family: inherit; font-size: clamp(9px, 1cqw, 14px);

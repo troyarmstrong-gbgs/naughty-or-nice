@@ -38,6 +38,7 @@
     const hash = location.hash.replace(/^#\/?/, "");
     const name = routes[hash] || "office";
     document.querySelectorAll(".scene").forEach((s) => (s.hidden = s.dataset.scene !== name));
+    document.body.dataset.scene = name;   // used by the "rotate your phone" prompt
     closeModal();
     window.scrollTo(0, 0);
     if (name === "board") {
@@ -414,6 +415,7 @@
 
   function openPuzzle(p) {
     if (p.url) {
+      document.body.classList.add("puzzle-open");
       openModal({ title: p.title, body: `<iframe src="${esc(p.url)}" title="${esc(p.title)}"></iframe>`, wide: true,
         actions: [{ label: "Close file", cls: "btn-primary", onClick: closeModal }] });
     } else {
@@ -446,6 +448,7 @@
   function closeModal() {
     if (modal.hidden) return;
     modal.hidden = true;
+    document.body.classList.remove("puzzle-open");
     $("#modal-body").innerHTML = "";
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
@@ -471,8 +474,11 @@
 
   /* ---------- mission briefing ---------- */
   const briefing = $("#briefing");
-  function openBriefing() { briefing.hidden = false; $("#close-briefing").focus(); }
-  function closeBriefing() { briefing.hidden = true; }
+  function openBriefing() { briefing.hidden = false; document.body.classList.add("intro-open"); $("#close-briefing").focus(); }
+  function closeBriefing() { briefing.hidden = true; document.body.classList.remove("intro-open"); }
+
+  /* ---------- rotate-your-phone prompt (CSS decides when it shows) ---------- */
+  $("#rotate-dismiss").addEventListener("click", () => document.body.classList.add("rotate-dismissed"));
   $("#open-briefing").addEventListener("click", openBriefing);
   $("#close-briefing").addEventListener("click", closeBriefing);
   briefing.addEventListener("click", (e) => { if (e.target === briefing) closeBriefing(); });
@@ -490,5 +496,6 @@
     $("#gate").hidden = true;
     openBriefing();
   });
+  document.body.classList.add("intro-open");
   $("#gate-open").focus();
 })();
